@@ -1,9 +1,23 @@
 package com.gestionstock;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        System.out.print("Bienvenue dans GestionStock!");
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
+
+public class Main extends Application {
+    @Override
+    public void start(Stage stage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/gestionstock/main.fxml")
+        );
+
+        Scene scene = new Scene(loader.load());
+        stage.setTitle("Gestion Stock IAGE");
+        stage.setScene(scene);
+        stage.show();
     }
 }
