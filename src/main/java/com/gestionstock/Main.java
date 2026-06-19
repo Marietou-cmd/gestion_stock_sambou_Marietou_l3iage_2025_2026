@@ -19,6 +19,9 @@ public class Main extends Application {
         );
 
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(
+                getClass().getResource("/com/gestionstock/style.css").toExternalForm()
+        );
         stage.setTitle("Gestion Stock IAGE");
         stage.setScene(scene);
         stage.show();

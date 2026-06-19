@@ -1,6 +1,8 @@
 package com.gestionstock.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
@@ -23,20 +25,29 @@ public class MainController {
 
     @FXML
     private void afficherProduits() {
-        contenuPrincipale.getChildren().clear();
-        contenuPrincipale.getChildren().add(new Label("Produits"));
+        chargerVue("/com/gestionstock/produits.fxml");
     }
 
     @FXML
     private void afficherCategories() {
-        contenuPrincipale.getChildren().clear();
-            contenuPrincipale.getChildren().add(new Label("Categories"));
+        chargerVue("/com/gestionstock/categories.fxml");
     }
 
     @FXML
     private void afficherFournisseurs() {
-        contenuPrincipale.getChildren().clear();
-        contenuPrincipale.getChildren().add(new Label("Fournisseurs"));
+        chargerVue("/com/gestionstock/fournisseurs.fxml");
     }
 
+    private void chargerVue(String cheminFxml) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(cheminFxml)
+            );
+            Node vue = loader.load();
+            contenuPrincipale.getChildren().clear();
+            contenuPrincipale.getChildren().add(vue);
+        } catch(Exception e){
+            System.err.println(e.getMessage());
+        }
+    }
 }
