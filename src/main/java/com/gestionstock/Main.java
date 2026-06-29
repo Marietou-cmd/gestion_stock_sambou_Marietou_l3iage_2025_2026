@@ -1,5 +1,6 @@
 package com.gestionstock;
 
+import com.gestionstock.util.DatabaseConfig;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,6 +15,8 @@ public class Main extends Application {
     }
     @Override
     public void start(Stage stage) throws IOException {
+        DatabaseConfig.testerConnection();
+
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/gestionstock/main.fxml")
         );
