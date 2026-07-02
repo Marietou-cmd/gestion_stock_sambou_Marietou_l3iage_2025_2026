@@ -1,5 +1,7 @@
 package com.gestionstock.controller;
 
+import com.gestionstock.dao.ProduitDao;
+import com.gestionstock.dao.ProduitDaoImpl;
 import com.gestionstock.model.Produit;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -9,6 +11,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.util.List;
 
 public class ProduitController {
     @FXML
@@ -24,9 +28,16 @@ public class ProduitController {
     @FXML
     TextField champRecherche;
 
+    private final ProduitDao produitDao = new ProduitDaoImpl();
+
     @FXML
     public void initialize() {
-        /*
+        configurerColones();
+        chargerDonnees();
+    }
+
+    private void configurerColones() {
+          /*
             - PropertyValueFactory: indique à la colonne d'afficher la valeur retournée par getNom() sur chaque objet Produit
             - ObservableList: C'est une liste spéciale qui permet de mettre à jour automatiquement TableView lorsque
             des éléments sont ajoutés ou supprimés.
@@ -39,14 +50,14 @@ public class ProduitController {
         colonneNom.setCellValueFactory( new PropertyValueFactory<>("nom"));
         colonnePrix.setCellValueFactory( new PropertyValueFactory<>("prix"));
         colonneStock.setCellValueFactory( new PropertyValueFactory<>("quantiteStock"));
-        colonneCategorie.setCellValueFactory( new PropertyValueFactory<>("categorie"));
+        colonneCategorie.setCellValueFactory( new PropertyValueFactory<>("categorie_nom"));
+    }
 
-        // Charger des données de test
-        ObservableList<Produit> listeProduits = FXCollections.observableArrayList(
-                new Produit("Ordinateur Portable", 15, 550000.0, "Informatique"),
-                new Produit("Bureau en bois", 8, 87000.0, "Mobilier"),
-                new Produit("Stylos (lost de 10)", 1000, 1499.0, "Fournitures")
-        );
+    private void chargerDonnees() {
+        // Charger des données depuis la base via JDBC API
+        List<Produit> produits = produitDao.findAllProduits();
+
+        ObservableList<Produit> listeProduits = FXCollections.observableArrayList(produits);
 
         tableProduits.setItems(listeProduits);
     }
