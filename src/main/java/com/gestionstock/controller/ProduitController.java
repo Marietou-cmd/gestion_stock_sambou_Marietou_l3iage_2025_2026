@@ -3,16 +3,18 @@ package com.gestionstock.controller;
 import com.gestionstock.dao.ProduitDao;
 import com.gestionstock.dao.ProduitDaoImpl;
 import com.gestionstock.model.Produit;
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ProduitController {
     @FXML
@@ -24,11 +26,18 @@ public class ProduitController {
     @FXML
     TableColumn<Produit, Integer> colonneStock;
     @FXML
+    TableColumn<Produit, Integer> colonneStockMin;
+    @FXML
     TableColumn<Produit, String> colonneCategorie;
+    @FXML
+    TableColumn<Produit, String> colonneFournisseur;
     @FXML
     TextField champRecherche;
 
     private final ProduitDao produitDao = new ProduitDaoImpl();
+
+    // Liste complète chargée depuis la base, utilisée comme référence pour la recherche
+    private ObservableList<Produit> listeProduits;
 
     @FXML
     public void initialize() {
@@ -50,15 +59,62 @@ public class ProduitController {
         colonneNom.setCellValueFactory( new PropertyValueFactory<>("nom"));
         colonnePrix.setCellValueFactory( new PropertyValueFactory<>("prix"));
         colonneStock.setCellValueFactory( new PropertyValueFactory<>("quantiteStock"));
+        colonneStockMin.setCellValueFactory( new PropertyValueFactory<>("quantiteMin"));
         colonneCategorie.setCellValueFactory( new PropertyValueFactory<>("categorie_nom"));
+        colonneFournisseur.setCellValueFactory( new PropertyValueFactory<>("fournisseur_nom"));
     }
 
     private void chargerDonnees() {
         // Charger des données depuis la base via JDBC API
         List<Produit> produits = produitDao.findAllProduits();
 
-        ObservableList<Produit> listeProduits = FXCollections.observableArrayList(produits);
+        listeProduits = FXCollections.observableArrayList(produits);
 
         tableProduits.setItems(listeProduits);
+    }
+
+    @FXML
+    private void rechercherProduits() {
+        String recherche = champRecherche.getText();
+
+        if (recherche == null || recherche.isBlank()) {
+            tableProduits.setItems(listeProduits);
+            return;
+        }
+
+        String rechercheMinuscule = recherche.trim().toLowerCase();
+
+        ObservableList<Produit> resultats = listeProduits.filtered(produit ->
+                (produit.getNom() != null && produit.getNom().toLowerCase().contains(rechercheMinuscule))
+                        || (produit.getCategorie_nom() != null && produit.getCategorie_nom().toLowerCase().contains(rechercheMinuscule))
+        );
+
+        tableProduits.setItems(resultats);
+    }
+
+    @FXML
+    private void supprimerProduit() {
+        Produit produitSelectionne = tableProduits.getSelectionModel().getSelectedItem();
+
+        if (produitSelectionne == null) {
+            Alert alerteInfo = new Alert(Alert.AlertType.INFORMATION);
+            alerteInfo.setTitle("Aucune sélection");
+            alerteInfo.setHeaderText(null);
+            alerteInfo.setContentText("Veuillez sélectionner un produit à supprimer.");
+            alerteInfo.showAndWait();
+            return;
+        }
+
+        Alert alerteConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        alerteConfirmation.setTitle("Confirmation de suppression");
+        alerteConfirmation.setHeaderText(null);
+        alerteConfirmation.setContentText("Voulez-vous vraiment supprimer le produit \"" + produitSelectionne.getNom() + "\" ?");
+
+        Optional<ButtonType> reponse = alerteConfirmation.showAndWait();
+
+        if (reponse.isPresent() && reponse.get() == ButtonType.OK) {
+            produitDao.deleteProduit(produitSelectionne.getId());
+            chargerDonnees();
+        }
     }
 }

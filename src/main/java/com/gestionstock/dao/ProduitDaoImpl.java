@@ -27,11 +27,11 @@ public class ProduitDaoImpl implements ProduitDao{
         String sql = SELECT_AVEC_JOINS;
 
         try (Connection conn = DatabaseConfig.getConnection()){
-          PreparedStatement ps = conn.prepareStatement(sql);
-          ResultSet rs = ps.executeQuery();
-          while (rs.next()) {
-              produits.add(mappingProduit(rs));
-          }
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                produits.add(mappingProduit(rs));
+            }
         }catch (SQLException e) {
             throw new RuntimeException("Erreur de récupération des produits: " + e.getMessage());
         }
@@ -66,7 +66,14 @@ public class ProduitDaoImpl implements ProduitDao{
 
     @Override
     public void deleteProduit(int id) {
-
+        String sql = "DELETE FROM produits WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur de suppression du produit: " + id + " : " + e.getMessage());
+        }
     }
 
     /*

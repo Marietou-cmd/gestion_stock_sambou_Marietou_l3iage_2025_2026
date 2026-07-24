@@ -23,6 +23,10 @@ public class Produit {
         this.fournisseur_nom = fournisseur_nom;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
