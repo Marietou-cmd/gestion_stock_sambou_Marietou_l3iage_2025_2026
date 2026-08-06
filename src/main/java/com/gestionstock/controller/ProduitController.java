@@ -1,8 +1,11 @@
 package com.gestionstock.controller;
 
-import com.gestionstock.dao.ProduitDao;
-import com.gestionstock.dao.ProduitDaoImpl;
+import com.gestionstock.model.Categorie;
+import com.gestionstock.model.Fournisseur;
+import com.gestionstock.service.ProduitService;
+import com.gestionstock.service.ProduitServiceImpl;
 import com.gestionstock.model.Produit;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -34,7 +37,7 @@ public class ProduitController {
     @FXML
     TextField champRecherche;
 
-    private final ProduitDao produitDao = new ProduitDaoImpl();
+    private final ProduitService produitService = new ProduitServiceImpl();
 
     // Liste complète chargée depuis la base, utilisée comme référence pour la recherche
     private ObservableList<Produit> listeProduits;
@@ -60,13 +63,19 @@ public class ProduitController {
         colonnePrix.setCellValueFactory( new PropertyValueFactory<>("prix"));
         colonneStock.setCellValueFactory( new PropertyValueFactory<>("quantiteStock"));
         colonneStockMin.setCellValueFactory( new PropertyValueFactory<>("quantiteMin"));
-        colonneCategorie.setCellValueFactory( new PropertyValueFactory<>("categorie_nom"));
-        colonneFournisseur.setCellValueFactory( new PropertyValueFactory<>("fournisseur_nom"));
+        colonneCategorie.setCellValueFactory( data -> {
+            Categorie cat = data.getValue().getCategorie();
+            return new SimpleStringProperty(cat != null ? cat.getNom() : "");
+        });
+        colonneFournisseur.setCellValueFactory( data -> {
+            Fournisseur fournisseur = data.getValue().getFournisseur();
+            return new SimpleStringProperty(fournisseur != null ? fournisseur.getNom() : "");
+        });
     }
 
     private void chargerDonnees() {
         // Charger des données depuis la base via JDBC API
-        List<Produit> produits = produitDao.findAllProduits();
+        List<Produit> produits = produitService.findAllProduits();
 
         listeProduits = FXCollections.observableArrayList(produits);
 
@@ -86,7 +95,7 @@ public class ProduitController {
 
         ObservableList<Produit> resultats = listeProduits.filtered(produit ->
                 (produit.getNom() != null && produit.getNom().toLowerCase().contains(rechercheMinuscule))
-                        || (produit.getCategorie_nom() != null && produit.getCategorie_nom().toLowerCase().contains(rechercheMinuscule))
+                        //|| (produit.getCategorie() != null && produit.getCategorie_nom().toLowerCase().contains(rechercheMinuscule))
         );
 
         tableProduits.setItems(resultats);
@@ -113,7 +122,7 @@ public class ProduitController {
         Optional<ButtonType> reponse = alerteConfirmation.showAndWait();
 
         if (reponse.isPresent() && reponse.get() == ButtonType.OK) {
-            produitDao.deleteProduit(produitSelectionne.getId());
+            produitService.deleteProduit(produitSelectionne.getId());
             chargerDonnees();
         }
     }
