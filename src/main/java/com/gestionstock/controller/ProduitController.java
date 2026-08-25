@@ -15,7 +15,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +32,8 @@ public class ProduitController {
     TableColumn<Produit, Integer> colonneNom;
     @FXML
     TableColumn<Produit, Double> colonnePrix;
+    @FXML
+    TableColumn<Produit, Double> colonnePrixPromo;
     @FXML
     TableColumn<Produit, Integer> colonneStock;
     @FXML
@@ -61,6 +69,7 @@ public class ProduitController {
         // Lier chaque colonne à un attribut de la classe Produit
         colonneNom.setCellValueFactory( new PropertyValueFactory<>("nom"));
         colonnePrix.setCellValueFactory( new PropertyValueFactory<>("prix"));
+        colonnePrixPromo.setCellValueFactory( new PropertyValueFactory<>("prixPromo"));
         colonneStock.setCellValueFactory( new PropertyValueFactory<>("quantiteStock"));
         colonneStockMin.setCellValueFactory( new PropertyValueFactory<>("quantiteMin"));
         colonneCategorie.setCellValueFactory( data -> {
@@ -99,6 +108,33 @@ public class ProduitController {
         );
 
         tableProduits.setItems(resultats);
+    }
+    @FXML
+    private void ajouterProduit() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/gestionstock/AddProduitDialog.fxml"));
+            Parent racine = loader.load();
+
+            AddProduitDialogController controleurDialog = loader.getController();
+
+            Stage fenetreDialog = new Stage();
+            fenetreDialog.setTitle("Nouveau produit");
+            fenetreDialog.initModality(Modality.APPLICATION_MODAL);
+            fenetreDialog.setScene(new Scene(racine));
+            fenetreDialog.showAndWait(); // bloque ici tant que la fenêtre n'est pas fermée
+
+            if (controleurDialog.isProduitAjoute()) {
+                chargerDonnees();
+            }
+        } catch (IOException e) {
+            Alert alerteErreur = new Alert(Alert.AlertType.ERROR);
+            alerteErreur.setTitle("Erreur");
+            alerteErreur.setHeaderText(null);
+            alerteErreur.setContentText("Impossible d'ouvrir le formulaire d'ajout de produit.");
+            alerteErreur.showAndWait();
+            e.printStackTrace();
+        }
     }
 
     @FXML

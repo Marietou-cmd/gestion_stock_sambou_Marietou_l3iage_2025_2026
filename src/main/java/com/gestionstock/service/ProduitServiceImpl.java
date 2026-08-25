@@ -84,8 +84,10 @@ public class ProduitServiceImpl implements ProduitService {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             em.getTransaction().begin();
-            Optional<Produit> produitOptional = findById(id);
-            if(produitOptional.isPresent()) em.remove(produitOptional);
+            Produit produit = em.find(Produit.class, id);
+            if (produit != null) {
+                em.remove(produit);
+            }
             em.getTransaction().commit();
         } catch (Exception e){
             em.getTransaction().rollback();

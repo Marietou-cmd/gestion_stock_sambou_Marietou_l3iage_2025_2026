@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS produits(
     id  INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(150) NOT NULL,
     prix DECIMAL(12, 2) NOT NULL,
+    prix_promo DECIMAL(12, 2),
     quantite_stock INT NOT NULL DEFAULT 0,
     quantite_min INT NOT NULL DEFAULT 5,
     categorie_id INT,
