@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -71,7 +72,7 @@ public class MainController {
 
     @FXML
     private void afficherCategories() {
-        chargerVue("/com/gestionstock/categories.fxml");
+        chargerVue("/com/gestionstock/categoriesView.fxml");
     }
 
     @FXML
@@ -87,7 +88,13 @@ public class MainController {
             Node vue = loader.load();
             contenuPrincipale.getChildren().clear();
             contenuPrincipale.getChildren().add(vue);
-        } catch(Exception e){
+        } catch (Exception e) {
+            contenuPrincipale.getChildren().clear();
+            Alert alerteErreur = new Alert(Alert.AlertType.ERROR);
+            alerteErreur.setTitle("Erreur");
+            alerteErreur.setHeaderText(null);
+            alerteErreur.setContentText("Cette section n'est pas encore disponible.");
+            alerteErreur.showAndWait();
             e.printStackTrace();
         }
     }
