@@ -47,12 +47,22 @@ CREATE TABLE IF NOT EXISTS produits(
 -- Table mouvements de stock
 CREATE TABLE IF NOT EXISTS mouvements(
                                          id  SERIAL PRIMARY KEY,
-                                         type VARCHAR(8) NOT NULL CHECK (type IN ('ENTRE', 'SORTIE')),
+                                         type VARCHAR(8) NOT NULL CHECK (type IN ('ENTREE', 'SORTIE')),
     quantite INTEGER NOT NULL,
     date_mouvement TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     motif VARCHAR(255),
     produit_id INTEGER,
     FOREIGN KEY (produit_id) REFERENCES produits(id)
+    );
+-- Table utilisateurs
+CREATE TABLE IF NOT EXISTS utilisateurs(
+                                           id SERIAL PRIMARY KEY,
+                                           email VARCHAR(150) NOT NULL UNIQUE,
+    nom VARCHAR(100) NOT NULL,
+    mot_de_passe_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(15) NOT NULL CHECK (role IN ('ADMIN', 'GESTIONNAIRE')),
+    date_creation DATE DEFAULT CURRENT_DATE,
+    actif BOOLEAN NOT NULL DEFAULT TRUE
     );
 
 
@@ -73,3 +83,7 @@ INSERT INTO fournisseurs(nom, email, tel) VALUES
 INSERT INTO produits(nom, prix, quantite_stock, quantite_min, categorie_id, fournisseur_id) VALUES
                                                                                                 ('Ordinateur Portable', 550000.0, 15, 3, 1, 1),
                                                                                                 ('Bureau en bois', 87000.0, 8, 2, 2, 2);
+
+INSERT INTO utilisateurs(email, nom, mot_de_passe_hash, role) VALUES
+                                                                  ('admin@gestionstock.sn', 'Admin Principal', '$2a$10$UGVvmrBHiYPajzF5S9NXqeXPI81R9QZr540faUY3V8PAZjWzaG5kK', 'ADMIN'),
+                                                                  ('gestionnaire@gestionstock.sn', 'Gestionnaire Test', '$2a$10$JL527EWcntnG7NRJS5ZI..pf9UUFzpBqNUSEj1XqBWPSz5dxNwBeu', 'GESTIONNAIRE');
