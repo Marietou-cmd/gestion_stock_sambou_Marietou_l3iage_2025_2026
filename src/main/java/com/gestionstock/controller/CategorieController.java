@@ -79,6 +79,9 @@ public class CategorieController {
                     Categorie categorie = getTableView().getItems().get(getIndex());
                     supprimerCategorie(categorie);
                 });
+                boolean estAdmin = com.gestionstock.util.SessionUtilisateur.getInstance().estAdmin();
+                boutonSupprimer.setVisible(estAdmin);
+                boutonSupprimer.setManaged(estAdmin);
             }
 
             @Override
@@ -143,6 +146,11 @@ public class CategorieController {
     }
 
     private void supprimerCategorie(Categorie categorie) {
+        if (!com.gestionstock.util.SessionUtilisateur.getInstance().estAdmin()) {
+            afficherErreur("Seul un administrateur peut supprimer une catégorie.");
+            return;
+        }
+
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirmation");
         confirmation.setHeaderText(null);
