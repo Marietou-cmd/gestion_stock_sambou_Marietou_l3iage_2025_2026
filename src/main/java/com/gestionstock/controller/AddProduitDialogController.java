@@ -45,10 +45,12 @@ public class AddProduitDialogController {
     private final CategorieService categorieService = new CategorieServiceImpl();
     private final FournisseurService fournisseurService = new FournisseurServiceImpl();
 
-    // Indique au contrôleur appelant (ProduitController) si un produit a bien été enregistré,
-    // pour savoir s'il doit rafraîchir la liste après la fermeture de ce dialog.
-    private boolean produitAjoute = false;
+    // null => mode "ajout" ; non-null => mode "modification"
+    private Produit produitAModifier = null;
 
+    // Indique au contrôleur appelant (ProduitController) si un produit a bien été enregistré,
+// pour savoir s'il doit rafraîchir la liste après la fermeture de ce dialog.
+    private boolean produitAjoute = false;
     @FXML
     public void initialize() {
         comboCategorie.setItems(FXCollections.observableArrayList(categorieService.findAllCategories()));
@@ -81,6 +83,17 @@ public class AddProduitDialogController {
         });
     }
 
+    public void setProduitAModifier(Produit produit) {
+        this.produitAModifier = produit;
+        champNom.setText(produit.getNom());
+        comboCategorie.setValue(produit.getCategorie());
+        comboFournisseur.setValue(produit.getFournisseur());
+        champPrix.setText(String.valueOf(produit.getPrix()));
+        champPrixPromo.setText(produit.getPrixPromo() == null ? "" : String.valueOf(produit.getPrixPromo()));
+        champQuantiteStock.setText(String.valueOf(produit.getQuantiteStock()));
+        champQuantiteMin.setText(String.valueOf(produit.getQuantiteMin()));
+    }
+
     public boolean isProduitAjoute() {
         return produitAjoute;
     }
@@ -93,7 +106,7 @@ public class AddProduitDialogController {
             return;
         }
 
-        Produit produit = new Produit();
+        Produit produit = produitAModifier == null ? new Produit() : produitAModifier;
         produit.setNom(champNom.getText().trim());
         produit.setCategorie(comboCategorie.getValue());
         produit.setFournisseur(comboFournisseur.getValue());
@@ -102,12 +115,14 @@ public class AddProduitDialogController {
         produit.setQuantiteMin(Integer.parseInt(champQuantiteMin.getText().trim()));
 
         String prixPromoTexte = champPrixPromo.getText() == null ? "" : champPrixPromo.getText().trim();
-        if (!prixPromoTexte.isEmpty()) {
-            produit.setPrixPromo(Double.parseDouble(prixPromoTexte));
-        }
+        produit.setPrixPromo(prixPromoTexte.isEmpty() ? null : Double.parseDouble(prixPromoTexte));
 
         try {
-            produitService.addProduit(produit);
+            if (produitAModifier == null) {
+                produitService.addProduit(produit);
+            } else {
+                produitService.updateProduit(produit);
+            }
         } catch (Exception e) {
             labelErreur.setText("Erreur lors de l'enregistrement : " + e.getMessage());
             return;
