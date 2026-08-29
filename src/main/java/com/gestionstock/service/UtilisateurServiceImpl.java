@@ -5,7 +5,7 @@ import com.gestionstock.util.JPAUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import org.mindrot.jbcrypt.BCrypt;
-
+import java.util.List;
 import java.util.Optional;
 
 public class UtilisateurServiceImpl implements UtilisateurService {
@@ -50,5 +50,32 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         // gensalt() génère un "sel" aléatoire à chaque appel : deux utilisateurs avec
         // le même mot de passe auront des hash différents en base (protection supplémentaire).
         return BCrypt.hashpw(motDePasseEnClair, BCrypt.gensalt());
+    }
+    @Override
+    public List<Utilisateur> findAllUtilisateurs() {
+        try (EntityManager em = JPAUtil.getEntityManager()) {
+            return em.createQuery(
+                    "SELECT u FROM Utilisateur u ORDER BY u.nom", Utilisateur.class
+            ).getResultList();
+        }
+    }
+
+    @Override
+    public void changerStatutActif(long utilisateurId, boolean actif) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Utilisateur utilisateur = em.find(Utilisateur.class, utilisateurId);
+            if (utilisateur != null) {
+                utilisateur.setActif(actif);
+                em.merge(utilisateur);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            throw new RuntimeException("Erreur lors du changement de statut de l'utilisateur", e);
+        } finally {
+            em.close();
+        }
     }
 }

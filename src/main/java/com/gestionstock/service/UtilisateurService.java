@@ -2,6 +2,7 @@ package com.gestionstock.service;
 
 import com.gestionstock.model.Utilisateur;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UtilisateurService {
@@ -15,4 +16,8 @@ public interface UtilisateurService {
     Optional<Utilisateur> findByEmail(String email);
 
     String hacherMotDePasse(String motDePasseEnClair);
+
+    List<Utilisateur> findAllUtilisateurs();
+
+    void changerStatutActif(long utilisateurId, boolean actif);
 }
