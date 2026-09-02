@@ -1,9 +1,12 @@
 package com.gestionstock.controller;
 
 import com.gestionstock.model.Mouvement;
+import com.gestionstock.model.Produit;
 import com.gestionstock.model.enums.TypeMouvement;
 import com.gestionstock.service.MouvementService;
 import com.gestionstock.service.MouvementServiceImpl;
+import com.gestionstock.service.ProduitService;
+import com.gestionstock.service.ProduitServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +20,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,6 +31,8 @@ public class MouvementController {
 
     private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    @FXML
+    private ComboBox<Produit> comboFiltreProduit;
     @FXML
     private ComboBox<String> comboFiltreType;
     @FXML
@@ -50,6 +56,7 @@ public class MouvementController {
     private TableColumn<Mouvement, String> colonneUtilisateur;
 
     private final MouvementService mouvementService = new MouvementServiceImpl();
+    private final ProduitService produitService = new ProduitServiceImpl();
 
     private static final String FILTRE_TOUTES = "Toutes";
     private static final String FILTRE_ENTREES = "Entrées";
@@ -60,8 +67,25 @@ public class MouvementController {
         comboFiltreType.setItems(FXCollections.observableArrayList(FILTRE_TOUTES, FILTRE_ENTREES, FILTRE_SORTIES));
         comboFiltreType.setValue(FILTRE_TOUTES);
 
+        configurerFiltreProduit();
         configurerColonnes();
         chargerDonnees(mouvementService.findAllMouvements());
+    }
+
+    private void configurerFiltreProduit() {
+        List<Produit> produits = produitService.findAllProduits();
+        comboFiltreProduit.setItems(FXCollections.observableArrayList(produits));
+        comboFiltreProduit.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Produit produit) {
+                return produit == null ? "Tous" : produit.getNom();
+            }
+
+            @Override
+            public Produit fromString(String s) {
+                return null;
+            }
+        });
     }
 
     private void configurerColonnes() {
@@ -116,6 +140,9 @@ public class MouvementController {
 
     @FXML
     private void appliquerFiltres() {
+        Produit produitChoisi = comboFiltreProduit.getValue();
+        Integer produitId = produitChoisi == null ? null : produitChoisi.getId();
+
         TypeMouvement type = switch (comboFiltreType.getValue()) {
             case FILTRE_ENTREES -> TypeMouvement.ENTREE;
             case FILTRE_SORTIES -> TypeMouvement.SORTIE;
@@ -125,12 +152,13 @@ public class MouvementController {
         LocalDate dateDebut = datePickerDebut.getValue();
         LocalDate dateFin = datePickerFin.getValue();
 
-        List<Mouvement> resultats = mouvementService.rechercherMouvements(null, type, dateDebut, dateFin);
+        List<Mouvement> resultats = mouvementService.rechercherMouvements(produitId, type, dateDebut, dateFin);
         chargerDonnees(resultats);
     }
 
     @FXML
     private void reinitialiserFiltres() {
+        comboFiltreProduit.setValue(null);
         comboFiltreType.setValue(FILTRE_TOUTES);
         datePickerDebut.setValue(null);
         datePickerFin.setValue(null);

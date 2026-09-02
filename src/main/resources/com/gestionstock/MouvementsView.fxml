@@ -24,6 +24,8 @@
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
+                <Label text="Produit :" />
+                <ComboBox fx:id="comboFiltreProduit" prefWidth="160.0" />
                 <Label text="Type :" />
                 <ComboBox fx:id="comboFiltreType" />
                 <Label text="Du :" />

@@ -87,3 +87,11 @@ INSERT INTO produits(nom, prix, quantite_stock, quantite_min, categorie_id, four
 INSERT INTO utilisateurs(email, nom, mot_de_passe_hash, role) VALUES
                                                                   ('admin@gestionstock.sn', 'Admin Principal', '$2a$10$UGVvmrBHiYPajzF5S9NXqeXPI81R9QZr540faUY3V8PAZjWzaG5kK', 'ADMIN'),
                                                                   ('gestionnaire@gestionstock.sn', 'Gestionnaire Test', '$2a$10$JL527EWcntnG7NRJS5ZI..pf9UUFzpBqNUSEj1XqBWPSz5dxNwBeu', 'GESTIONNAIRE');
+
+-- Mouvements de test : dates relatives à aujourd'hui, pour peupler le dashboard et les statistiques
+INSERT INTO mouvements(type, quantite, date_mouvement, motif, produit_id, utilisateur_id) VALUES
+                                                                                              ('ENTREE', 20, NOW() - INTERVAL '2 months', 'Réapprovisionnement initial', 1, 1),
+                                                                                              ('ENTREE', 10, NOW() - INTERVAL '2 months', 'Réapprovisionnement initial', 2, 1),
+                                                                                              ('SORTIE', 5, NOW() - INTERVAL '1 month', 'Vente client', 1, 2),
+                                                                                              ('SORTIE', 3, NOW() - INTERVAL '1 month', 'Vente client', 2, 2),
+                                                                                              ('SORTIE', 8, NOW(), 'Vente client', 1, 2);
