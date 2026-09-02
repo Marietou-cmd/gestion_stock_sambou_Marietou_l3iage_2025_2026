@@ -1,6 +1,7 @@
 package com.gestionstock.controller;
 
 import com.gestionstock.util.SessionUtilisateur;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -26,6 +27,8 @@ public class MainController {
     private Label labelUtilisateurConnecte;
     @FXML
     private Button boutonDeconnexion;
+    @FXML
+    private Button btnUtilisateurs;
 
     @FXML
     public void initialize() {
@@ -38,6 +41,10 @@ public class MainController {
         if (utilisateur != null) {
             labelUtilisateurConnecte.setText(utilisateur.getNom() + " (" + utilisateur.getRole() + ")");
         }
+
+        boolean estAdmin = SessionUtilisateur.getInstance().estAdmin();
+        btnUtilisateurs.setVisible(estAdmin);
+        btnUtilisateurs.setManaged(estAdmin);
     }
 
     @FXML
@@ -61,8 +68,7 @@ public class MainController {
 
     @FXML
     private void afficherDashboard() {
-        contenuPrincipale.getChildren().clear();
-        contenuPrincipale.getChildren().add(new Label("Dashboard"));
+        chargerVue("/com/gestionstock/DashboardView.fxml");
     }
 
     @FXML
@@ -77,7 +83,7 @@ public class MainController {
 
     @FXML
     private void afficherFournisseurs() {
-        chargerVue("/com/gestionstock/fournisseurs.fxml");
+        chargerVue("/com/gestionstock/fournisseursView.fxml");
     }
 
     private void chargerVue(String cheminFxml) {
@@ -97,5 +103,17 @@ public class MainController {
             alerteErreur.showAndWait();
             e.printStackTrace();
         }
+    }
+    @FXML
+    private void afficherMouvements() {
+        chargerVue("/com/gestionstock/MouvementsView.fxml");
+    }
+    @FXML
+    private void afficherUtilisateurs() {
+        chargerVue("/com/gestionstock/UtilisateursView.fxml");
+    }
+    @FXML
+    private void afficherStatistiques() {
+        chargerVue("/com/gestionstock/StatistiquesView.fxml");
     }
 }
